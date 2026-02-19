@@ -1,9 +1,13 @@
 import express from 'express'
 import dotenv from 'dotenv'
+import { UserRepository } from '../user-repository.js'
 
 dotenv.config()
 
 const app = express()
+
+app.use(express.static('client'))
+app.use(express.json())
 
 const PORT = process.env.PORT
 
@@ -16,11 +20,21 @@ app.post('/login', (req, res) => {
 })
 
 app.post('/register', (req, res) => {
-
+  const { username, password } = req.body
+  try {
+    const id = UserRepository.create({ username, password })
+    res.send({ id })
+  } catch (error) {
+    res.status(400).send({ error })
+  }
 })
 
 app.post('/logout', (req, res) => {
 
+})
+
+app.get('/protected', (req, res) => {
+  res.json({ message: 'Ruta Protegida' })
 })
 
 app.listen(PORT, () => {
