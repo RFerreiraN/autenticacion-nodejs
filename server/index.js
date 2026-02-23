@@ -20,9 +20,28 @@ app.get('/', (req, res) => {
   res.sendFile(process.cwd() + 'client/index.html')
 })
 
-app.post('/login', (req, res) => {
-  res.json({ usuario: 'Ricardo' })
+app.post('/login', async (req, res) => {
+  const result = validateUsuario(req.body)
+
+  if (result.error) {
+    return res.status(400).json({ message: JSON.parse(result.error.message) })
+  }
+  const { username, password } = result.data
+
+  try {
+    const user = await UsuarioRepository.login({ username, password })
+    res.json({
+      message: 'Login existoso',
+      user: {
+        id: user._id,
+        username: user.username
+      }
+    })
+  } catch (error) {
+    res.status(400).json({ message: error.message })
+  }
 })
+
 app.post('/register', async (req, res) => {
   const result = validateUsuario(req.body)
 
