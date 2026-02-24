@@ -16,9 +16,10 @@ export class UsuarioRepository {
     if (!user) {
       throw new Error('El usuario no existe')
     }
+
     const isValid = await bcrypt.compare(password, user.password)
     if (!isValid) {
-      throw new Error('La contraseña es incorrecta')
+      throw new Error('La contraseña es invalida')
     }
 
     return user

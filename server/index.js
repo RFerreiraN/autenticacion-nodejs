@@ -12,33 +12,35 @@ const app = express()
 
 await conectUserDb()
 
-app.use(express.static('client'))
+app.use(express.urlencoded({ extended: true }))
+app.set('view engine', 'ejs')
 app.disable('x-powered-by')
 app.use(express.json())
 
 app.get('/', (req, res) => {
-  res.sendFile(process.cwd() + 'client/index.html')
+  res.render('index')
 })
 
 app.post('/login', async (req, res) => {
   const result = validateUsuario(req.body)
 
-  if (result.error) {
+  if (!result.success) {
     return res.status(400).json({ message: JSON.parse(result.error.message) })
   }
+
   const { username, password } = result.data
 
   try {
     const user = await UsuarioRepository.login({ username, password })
-    res.json({
-      message: 'Login existoso',
+    return res.status(200).json({
+      message: 'Login exitoso',
       user: {
         id: user._id,
         username: user.username
       }
     })
   } catch (error) {
-    res.status(400).json({ message: error.message })
+    return res.status(401).json({ message: error.message })
   }
 })
 
@@ -52,7 +54,7 @@ app.post('/register', async (req, res) => {
   const { username, password } = result.data
   try {
     const user = await UsuarioRepository.create({ username, password })
-    res.status(201).json({
+    return res.status(201).json({
       message: 'Usuario creado',
       user: { id: user._id, username: user.username }
     })
@@ -60,11 +62,15 @@ app.post('/register', async (req, res) => {
     if (error.code === 11000) {
       return res.status(400).json({ message: 'El nombre de usuario ya existe' })
     } else {
-      res.status(500).json({ message: 'Error interno del servidor' })
+      return res.status(500).json({ message: 'Error interno del servidor' })
     }
   }
 })
 app.post('/logout', (req, res) => { })
+
+app.get('/protected', (req, res) => {
+  res.render('protected', { username: req.body.username || 'Usuario' })
+})
 
 app.listen(PORT, () => {
   console.log(`Server Listenig on port: http://localhost:${PORT}`)

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Bienvenido</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: #f0f2f5;
+    }
+
+    .welcome-card {
+      background: white;
+      padding: 3rem;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    a {
+      margin-top: 20px;
+      text-decoration: none;
+      color: #4facfe;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="welcome-card">
+    <h1>¡Hola de nuevo! <%= user.username %>👋</h1>
+    <p>Has iniciado sesión correctamente en el sistema.</p>
+    <a href="/">Cerrar Sesión</a>
+  </div>
+</body>
+
+</html>
