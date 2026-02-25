@@ -3,41 +3,84 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Bienvenido</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Control</title>
   <style>
     body {
-      font-family: sans-serif;
+      font-family: 'Segoe UI', sans-serif;
+      background: #eef2f3;
       display: flex;
-      flex-direction: column;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       height: 100vh;
-      background: #f0f2f5;
+      margin: 0;
     }
 
-    .welcome-card {
+    .card {
       background: white;
       padding: 3rem;
-      border-radius: 15px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
       text-align: center;
+      max-width: 400px;
     }
 
-    a {
-      margin-top: 20px;
-      text-decoration: none;
-      color: #4facfe;
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    p {
+      color: #666;
+      margin-bottom: 2rem;
+    }
+
+    .user-badge {
+      background: #4facfe;
+      color: white;
+      padding: 5px 15px;
+      border-radius: 20px;
       font-weight: bold;
+    }
+
+    button {
+      background: #ff4757;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #ff6b81;
     }
   </style>
 </head>
 
 <body>
-  <div class="welcome-card">
-    <h1>¡Hola de nuevo! <%= user.username %>👋</h1>
-    <p>Has iniciado sesión correctamente en el sistema.</p>
-    <a href="/">Cerrar Sesión</a>
+  <div class="card">
+    <h1>¡Hola, <span class="user-badge">
+        <%= username %>
+      </span>!</h1>
+    <p>Has entrado en la ruta protegida. Tu sesión está activa y segura.</p>
+
+    <form id="logout-form">
+      <button type="submit">Cerrar Sesión</button>
+    </form>
   </div>
+
+  <script>
+    document.getElementById('logout-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const res = await fetch('/logout', { method: 'POST' });
+      if (res.ok) {
+        window.location.href = '/'; // Volver al login al salir
+      }
+    });
+  </script>
 </body>
 
 </html>

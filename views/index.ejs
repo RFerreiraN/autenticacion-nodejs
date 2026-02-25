@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Acceso al Sistema</title>
+  <title>Sistema de Autenticación</title>
   <style>
     * {
       box-sizing: border-box;
@@ -25,11 +25,32 @@
       background: #fff;
       width: 100%;
       max-width: 400px;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      padding: 2.5rem;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     }
 
+    /* Estilos del Dashboard */
+    .dashboard {
+      text-align: center;
+    }
+
+    .user-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .welcome-title {
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
+
+    .user-name {
+      color: #4facfe;
+      font-weight: bold;
+    }
+
+    /* Estilos de Tabs */
     .header {
       display: flex;
       justify-content: space-around;
@@ -50,6 +71,7 @@
       border-bottom: 2px solid #4facfe;
     }
 
+    /* Estilos de Formulario */
     form {
       display: none;
     }
@@ -60,6 +82,7 @@
 
     .input-group {
       margin-bottom: 1.2rem;
+      text-align: left;
     }
 
     label {
@@ -73,12 +96,14 @@
       width: 100%;
       padding: 12px;
       border: 1px solid #ddd;
-      border-radius: 6px;
+      border-radius: 8px;
       outline: none;
+      transition: 0.3s;
     }
 
     input:focus {
       border-color: #4facfe;
+      box-shadow: 0 0 5px rgba(79, 172, 254, 0.3);
     }
 
     button {
@@ -87,23 +112,26 @@
       background: #4facfe;
       color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       font-size: 1rem;
       font-weight: bold;
       cursor: pointer;
       transition: 0.3s;
+      margin-top: 10px;
     }
 
     button:hover {
       background: #00f2fe;
+      transform: translateY(-1px);
     }
 
-    .success-msg {
-      color: #27ae60;
-      font-size: 0.85rem;
-      margin-top: 10px;
-      text-align: center;
-      display: none;
+    .logout-btn {
+      background: #ff4757;
+      margin-top: 2rem;
+    }
+
+    .logout-btn:hover {
+      background: #ff6b81;
     }
   </style>
 </head>
@@ -111,41 +139,52 @@
 <body>
 
   <div class="card">
-    <div class="header">
-      <div id="login-tab" class="tab active" onclick="switchTab('login')">LOGIN</div>
-      <div id="register-tab" class="tab" onclick="switchTab('register')">REGISTRO</div>
-    </div>
+    <% if (locals.user) { %>
+      <div class="dashboard">
+        <div class="user-icon">👤</div>
+        <h1 class="welcome-title">¡Hola, <span class="user-name">
+            <%= user.username %>
+          </span>!</h1>
+        <p>Tu sesión está activa y el token es válido.</p>
 
-    <form id="login-form" class="active">
-      <div class="input-group">
-        <label>Usuario</label>
-        <input type="text" name="username" required>
+        <form id="logout-form" style="display: block;">
+          <button type="submit" class="logout-btn">Cerrar Sesión</button>
+        </form>
       </div>
-      <div class="input-group">
-        <label>Contraseña</label>
-        <input type="password" name="password" required>
-      </div>
-      <button type="submit">Entrar</button>
-    </form>
+      <% } else { %>
+        <div class="header">
+          <div id="login-tab" class="tab active" onclick="switchTab('login')">LOGIN</div>
+          <div id="register-tab" class="tab" onclick="switchTab('register')">REGISTRO</div>
+        </div>
 
-    <form id="register-form">
-      <div class="input-group">
-        <label>Nuevo Usuario</label>
-        <input type="text" name="username" required>
-      </div>
-      <div class="input-group">
-        <label>Nueva Contraseña</label>
-        <input type="password" name="password" required>
-      </div>
-      <button type="submit" style="background: #27ae60;">Crear Cuenta</button>
-      <div id="reg-success" class="success-msg">¡Registro exitoso! Ya puedes loguearte.</div>
-    </form>
+        <form id="login-form" class="active">
+          <div class="input-group">
+            <label>Nombre de Usuario</label>
+            <input type="text" name="username" required autocomplete="username">
+          </div>
+          <div class="input-group">
+            <label>Contraseña</label>
+            <input type="password" name="password" required autocomplete="current-password">
+          </div>
+          <button type="submit">Entrar al Sistema</button>
+        </form>
+
+        <form id="register-form">
+          <div class="input-group">
+            <label>Elige un Usuario</label>
+            <input type="text" name="username" required autocomplete="username">
+          </div>
+          <div class="input-group">
+            <label>Crea una Contraseña</label>
+            <input type="password" name="password" required autocomplete="new-password">
+          </div>
+          <button type="submit" style="background: #27ae60;">Crear Cuenta Gratis</button>
+        </form>
+        <% } %>
   </div>
 
-
-
   <script>
-    // --- 1. LÓGICA DE NAVEGACIÓN ENTRE TABS ---
+    // --- Lógica para cambiar entre pestañas ---
     function switchTab(type) {
       const lForm = document.getElementById('login-form');
       const rForm = document.getElementById('register-form');
@@ -161,65 +200,82 @@
         rForm.classList.add('active');
         lForm.classList.remove('active');
         rTab.classList.add('active');
+        lTab.classList.add('active'); // Corrección visual
         lTab.classList.remove('active');
+        rTab.classList.add('active');
       }
     }
 
-    // --- 2. MANEJO DEL LOGIN (CON NAVEGACIÓN) ---
-    document.getElementById('login-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const formData = new FormData(e.target);
-      const data = Object.fromEntries(formData);
+    // --- Manejo de LOGIN ---
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(e.target));
 
-      try {
-        const response = await fetch('/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
+        try {
+          const response = await fetch('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
 
-        if (response.ok) {
-          e.target.reset(); // Vaciamos los inputs
-          // CAMBIA ESTA URL POR LA QUE QUIERAS NAVEGAR
-          window.location.href = '/protected';
-        } else {
-          const err = await response.json();
-          alert('Error en Login: ' + (err.message || 'Credenciales inválidas'));
+          if (response.ok) {
+            e.target.reset(); // Limpia inputs
+            window.location.href = '/protected'; // Recarga para entrar al Dashboard
+          } else {
+            const err = await response.json();
+            alert('Error: ' + (err.message || 'Credenciales incorrectas'));
+          }
+        } catch (error) {
+          alert('Error de conexión');
         }
-      } catch (error) {
-        alert('Error conectando con el servidor');
-      }
-    });
+      });
+    }
 
-    // --- 3. MANEJO DEL REGISTRO (CON LIMPIEZA) ---
-    document.getElementById('register-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const formData = new FormData(e.target);
-      const data = Object.fromEntries(formData);
+    // --- Manejo de REGISTRO ---
+    const registerForm = document.getElementById('register-form');
+    if (registerForm) {
+      registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(e.target));
 
-      try {
-        const response = await fetch('/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
+        try {
+          const response = await fetch('/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
 
-        if (response.ok) {
-          e.target.reset(); // Vaciamos los inputs
-          document.getElementById('reg-success').style.display = 'block';
-          // Después de 2 segundos, lo mandamos al tab de login
-          setTimeout(() => {
-            switchTab('login');
-            document.getElementById('reg-success').style.display = 'none';
-          }, 2000);
-        } else {
-          const err = await response.json();
-          alert('Error en Registro: ' + (err.message || 'No se pudo crear el usuario'));
+          if (response.ok) {
+            alert('¡Usuario creado! Ahora inicia sesión.');
+            e.target.reset(); // Limpia inputs
+            switchTab('login'); // Te mueve al login automáticamente
+          } else {
+            const err = await response.json();
+            alert('Error: ' + (err.message || 'No se pudo registrar'));
+          }
+        } catch (error) {
+          alert('Error de conexión');
         }
-      } catch (error) {
-        alert('Error conectando con el servidor');
-      }
-    });
+      });
+    }
+
+    // --- Manejo de LOGOUT ---
+    const logoutForm = document.getElementById('logout-form');
+    if (logoutForm) {
+      logoutForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        try {
+          const response = await fetch('/logout', { method: 'POST' });
+          if (response.ok) {
+            window.location.href = '/'; // Recarga para volver al Login
+          }
+        } catch (error) {
+          alert('Error al cerrar sesión');
+        }
+      });
+    }
   </script>
 
 </body>
